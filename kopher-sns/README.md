@@ -5,3 +5,5 @@
 - Vite
 - React
 - TypeScript
+- Shadcn/ui
+
