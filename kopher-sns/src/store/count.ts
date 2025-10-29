@@ -1,19 +1,22 @@
 import { create } from "zustand";
 import { combine } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 
 const useCountStore = create(
-  combine(
-    {
-      count: 0,
-    },
-    (set) => ({
-      increment: () => {
-        set((state) => ({ count: state.count + 1 }));
+  immer(
+    combine(
+      {
+        count: 0,
       },
-      decrement: () => {
-        set((state) => ({ count: state.count - 1 }));
-      },
-    }),
+      (set) => ({
+        increment: () => {
+          set((state) => (state.count += 1));
+        },
+        decrement: () => {
+          set((state) => (state.count -= 1));
+        },
+      }),
+    ),
   ),
 );
 
