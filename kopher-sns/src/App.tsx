@@ -1,11 +1,15 @@
 import "./App.css";
-import { Button } from "@/components/ui/button.tsx";
+import { Route, Routes } from "react-router";
+import CounterPage from "@/pages/counter-page.tsx";
 
 function App() {
   return (
-    <div>
-      <Button>Hello</Button>
-    </div>
+    <Routes>
+      <Route path="/" element={<div>Home</div>} />
+      <Route path="/counter" element={<CounterPage />} />
+      <Route path="/sign-in" element={<div>Sign In</div>} />
+      <Route path="/sign-up" element={<div>Sign Up</div>} />
+    </Routes>
   );
 }
 
