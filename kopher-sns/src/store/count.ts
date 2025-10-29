@@ -1,21 +1,21 @@
 import { create } from "zustand";
+import { combine } from "zustand/middleware";
 
-interface Store {
-  count: number;
-  increment: () => void;
-  decrement: () => void;
-}
-const useCountStore = create<Store>((set, get) => {
-  return {
-    count: 0,
-    increment: () => {
-      set({ count: get().count + 1 });
+const useCountStore = create(
+  combine(
+    {
+      count: 0,
     },
-    decrement: () => {
-      set({ count: get().count - 1 });
-    },
-  };
-});
+    (set) => ({
+      increment: () => {
+        set((state) => ({ count: state.count + 1 }));
+      },
+      decrement: () => {
+        set((state) => ({ count: state.count - 1 }));
+      },
+    }),
+  ),
+);
 
 export function useCount() {
   return useCountStore((store) => store.count);
