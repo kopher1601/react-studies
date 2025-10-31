@@ -1,0 +1,19 @@
+{
+  "todos": [
+    {
+      "id": 1,
+      "content": "todo1",
+      "isDone": true
+    },
+    {
+      "id": 2,
+      "content": "todo2",
+      "isDone": true
+    },
+    {
+      "id": 3,
+      "content": "todo3",
+      "isDone": false
+    }
+  ]
+}
