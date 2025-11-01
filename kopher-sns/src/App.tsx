@@ -8,7 +8,7 @@ function App() {
     <Routes>
       <Route path="/" element={<div>Home</div>} />
       <Route path="/counter" element={<CounterPage />} />
-      <Route path="/todolist" element={<TodoListPage />} />
+      <Route path="/todo-list" element={<TodoListPage />} />
       <Route path="/sign-in" element={<div>Sign In</div>} />
       <Route path="/sign-up" element={<div>Sign Up</div>} />
     </Routes>
