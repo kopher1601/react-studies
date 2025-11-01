@@ -1,6 +1,6 @@
 import TodoEditor from "@/components/todo-list/todo-editor.tsx";
 import TodoItem from "@/components/todo-list/todo-item.tsx";
-import { useTodosData } from "@/hooks/quries/use-todos.data.ts";
+import { useTodosData } from "@/hooks/quries/use-todos-data.ts";
 
 export default function TodoListPage() {
   const { data: todos, isLoading, error } = useTodosData();
