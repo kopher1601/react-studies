@@ -1,7 +1,7 @@
 import { API_URL } from "@/lib/constants.ts";
 import type { Todo } from "@/types.ts";
 
-export async function fetchTodoById(id: number): Promise<Todo> {
+export async function fetchTodoById(id: string): Promise<Todo> {
   const response = await fetch(`${API_URL}/todos/${id}`);
 
   console.log("call fetchTodoById", response);

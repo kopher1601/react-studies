@@ -3,7 +3,7 @@ import { useTodoDataById } from "@/hooks/quries/use-todo-data-by-id.ts";
 
 export default function TodoDetailPage() {
   const { id } = useParams();
-  const { data, isLoading, error } = useTodoDataById(Number(id));
+  const { data, isLoading, error } = useTodoDataById(String(id));
 
   if (isLoading) {
     return <div>Loading...</div>;
