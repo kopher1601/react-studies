@@ -9,9 +9,13 @@ export function useCreateTodoMutation() {
   return useMutation({
     mutationFn: createTodo,
     onSuccess: (newTodo) => {
-      queryClient.setQueryData<Todo[]>(QUERY_KEYS.todo.list, (oldData) => {
-        if (!oldData) return;
-        return [...oldData, newTodo];
+      queryClient.setQueryData<Todo>(
+        QUERY_KEYS.todo.detail(newTodo.id),
+        newTodo,
+      );
+      queryClient.setQueryData<string[]>(QUERY_KEYS.todo.list, (oldData) => {
+        if (!oldData) return [newTodo.id];
+        return [...oldData, newTodo.id];
       });
     },
   });

@@ -9,43 +9,31 @@ export function useUpdateTodoMutation() {
   return useMutation({
     mutationFn: updateTodo,
     onMutate: async (updatedTodo) => {
-      // 데이터 변경 처리 전에 조회 처리 후 업데이트 처리가 있을 경우 데이터 일관성의 불일치가 발생할 수 있기 때문에
-      // 쿼리 처리가 있는 경우 캔슬시킨다.
       await queryClient.cancelQueries({
-        queryKey: QUERY_KEYS.todo.list,
+        queryKey: QUERY_KEYS.todo.detail(updatedTodo.id),
       });
 
-      // 실패를 대비한 백업 데이터
-      const prevTodos = queryClient.getQueryData<Todo[]>(QUERY_KEYS.todo.list);
+      const prevTodo = queryClient.getQueryData<Todo>(
+        QUERY_KEYS.todo.detail(updatedTodo.id),
+      );
 
-      // mutate 함수가 실행될때 전달된 매개변수를 받아올 수 있다
-      // 여기서 낙관적 쿼리관련 로직을 구현
-      queryClient.setQueryData<Todo[]>(QUERY_KEYS.todo.list, (oldData) => {
-        if (!oldData) return;
+      queryClient.setQueryData<Todo>(
+        QUERY_KEYS.todo.detail(updatedTodo.id),
+        (oldData) => {
+          if (!oldData) return;
+          return { ...oldData, ...updatedTodo };
+        },
+      );
 
-        return oldData.map((prevTodo) =>
-          prevTodo.id === updatedTodo.id
-            ? { ...prevTodo, ...updatedTodo }
-            : prevTodo,
-        );
-      });
-
-      return {
-        prevTodos,
-      };
+      return { prevTodo };
     },
     onError: (_error, _updatedTodo, context) => {
-      if (context && context.prevTodos) {
-        queryClient.setQueryData<Todo[]>(
-          QUERY_KEYS.todo.list,
-          context.prevTodos,
+      if (context && context.prevTodo) {
+        queryClient.setQueryData<Todo>(
+          QUERY_KEYS.todo.detail(context.prevTodo.id),
+          context.prevTodo,
         );
       }
-    },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.todo.list,
-      });
     },
   });
 }
