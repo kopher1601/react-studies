@@ -8,7 +8,7 @@ export function useCreateTodoMutation() {
 
   return useMutation({
     mutationFn: createTodo,
-    onSuccess: async (newTodo) => {
+    onSuccess: (newTodo) => {
       queryClient.setQueryData<Todo[]>(QUERY_KEYS.todo.list, (oldData) => {
         if (!oldData) return;
         return [...oldData, newTodo];
