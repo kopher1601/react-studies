@@ -1,15 +1,28 @@
 import supabase from "@/lib/supabase.ts";
 
-interface SignUpParams {
+interface AuthRequestParams {
   email: string;
   password: string;
 }
-export async function signUp({ email, password }: SignUpParams) {
-  const response = await supabase.auth.signUp({ email, password });
-  if (response.error) {
-    console.error(response.error);
-    throw new Error(response.error.message);
+export async function signUp({ email, password }: AuthRequestParams) {
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) {
+    console.error(error);
+    throw new Error(error.message);
   }
 
-  return response.data;
+  return data;
+}
+
+export async function signIn({ email, password }: AuthRequestParams) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  if (error) {
+    console.error(error);
+    throw new Error(error.message);
+  }
+
+  return data;
 }
