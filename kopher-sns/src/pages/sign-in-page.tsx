@@ -4,11 +4,15 @@ import { Link } from "react-router";
 import { useState } from "react";
 import { useSignInWithPassword } from "@/hooks/mutations/use-sign-in-with-password.ts";
 
+import GithubIcon from "@/assets/github-mark.svg";
+import { useSignInWithOAuth } from "@/hooks/mutations/use-sign-in-with-oauth.ts";
+
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const { mutate: signIn } = useSignInWithPassword();
+  const { mutate: signInWithOAuth } = useSignInWithOAuth();
 
   const handleSignInClick = () => {
     if (email.trim() === "") {
@@ -20,6 +24,10 @@ export default function SignInPage() {
     }
 
     signIn({ email, password });
+  };
+
+  const handleSignInWithOAuthClick = () => {
+    signInWithOAuth("github");
   };
 
   return (
@@ -41,9 +49,17 @@ export default function SignInPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <div>
+      <div className="flex flex-col gap-2">
         <Button className="w-full" onClick={handleSignInClick}>
           ログイン
+        </Button>
+        <Button
+          className="w-full"
+          variant="outline"
+          onClick={handleSignInWithOAuthClick}
+        >
+          <img src={GithubIcon} alt="Github Icon" className="h-4 w-4" />
+          Github ログイン
         </Button>
       </div>
       <div>
