@@ -1,5 +1,9 @@
 import { type ReactNode, useEffect } from "react";
-import { useIsSessionLoaded, useSession, useSetSession } from "@/store/session.ts";
+import {
+  useIsSessionLoaded,
+  useSession,
+  useSetSession,
+} from "@/store/session.ts";
 import supabase from "@/lib/supabase.ts";
 import GlobalLoader from "@/components/global-loader.tsx";
 import { useProfileData } from "@/hooks/queries/use-profile-data.ts";
