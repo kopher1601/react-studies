@@ -9,7 +9,7 @@ export async function signUp({ email, password }: AuthRequestParams) {
   const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) {
     console.error(error);
-    throw new Error(error.message);
+    throw error;
   }
 
   return data;
@@ -34,7 +34,29 @@ export async function signInWithOAuth(provider: Provider) {
   });
   if (error) {
     console.error(error);
-    throw new Error(error.message);
+    throw error;
+  }
+
+  return data;
+}
+
+export async function requestPasswordResetEmail(email: string) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${import.meta.env.VITE_PUBLIC_URL}/reset-password`,
+  });
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  return data;
+}
+
+export async function updatePassword(password: string) {
+  const { data, error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    console.error(error);
+    throw error;
   }
 
   return data;
