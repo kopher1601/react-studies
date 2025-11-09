@@ -6,13 +6,28 @@ import { useSignInWithPassword } from "@/hooks/mutations/use-sign-in-with-passwo
 
 import GithubIcon from "@/assets/github-mark.svg";
 import { useSignInWithOAuth } from "@/hooks/mutations/use-sign-in-with-oauth.ts";
+import { toast } from "sonner";
+import { generateErrorMessage } from "@/lib/error.ts";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { mutate: signIn } = useSignInWithPassword();
-  const { mutate: signInWithOAuth } = useSignInWithOAuth();
+  const { mutate: signIn, isPending: isSigningInWithPassword } =
+    useSignInWithPassword({
+      onError: (error) => {
+        const errorMessage = generateErrorMessage(error);
+        toast.error(errorMessage, { position: "top-center" });
+        setPassword("");
+      },
+    });
+  const { mutate: signInWithOAuth, isPending: isSigningInWithOAuth } =
+    useSignInWithOAuth({
+      onError: (error) => {
+        const errorMessage = generateErrorMessage(error);
+        toast.error(errorMessage, { position: "top-center" });
+      },
+    });
 
   const handleSignInClick = () => {
     if (email.trim() === "") {
@@ -30,6 +45,8 @@ export default function SignInPage() {
     signInWithOAuth("github");
   };
 
+  const isPendig = isSigningInWithPassword || isSigningInWithOAuth;
+
   return (
     <div className="flex flex-col gap-8">
       <div className="text-xl font-bold">ログイン</div>
@@ -40,6 +57,7 @@ export default function SignInPage() {
           placeholder="example@abc.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={isPendig}
         />
         <Input
           className="py-6"
@@ -47,16 +65,22 @@ export default function SignInPage() {
           placeholder="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={isPendig}
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Button className="w-full" onClick={handleSignInClick}>
+        <Button
+          className="w-full"
+          onClick={handleSignInClick}
+          disabled={isPendig}
+        >
           ログイン
         </Button>
         <Button
           className="w-full"
           variant="outline"
           onClick={handleSignInWithOAuthClick}
+          disabled={isPendig}
         >
           <img src={GithubIcon} alt="Github Icon" className="h-4 w-4" />
           Github ログイン

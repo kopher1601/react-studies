@@ -22,7 +22,7 @@ export async function signIn({ email, password }: AuthRequestParams) {
   });
   if (error) {
     console.error(error);
-    throw new Error(error.message);
+    throw error;
   }
 
   return data;
