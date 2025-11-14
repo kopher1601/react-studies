@@ -1,10 +1,13 @@
 import RootRoute from "@/root-route.tsx";
 import SessionProvider from "@/provider/session-provider.tsx";
+import ModalProvider from "@/provider/modal-provider.tsx";
 
 function App() {
   return (
     <SessionProvider>
-      <RootRoute />
+      <ModalProvider>
+        <RootRoute />
+      </ModalProvider>
     </SessionProvider>
   );
 }
