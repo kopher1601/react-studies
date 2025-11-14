@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { useState } from "react";
-import { useUpdatePassword } from "@/hooks/mutations/use-update-password.ts";
+import { useUpdatePassword } from "@/hooks/mutations/auth/use-update-password.ts";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
 import { generateErrorMessage } from "@/lib/error.ts";

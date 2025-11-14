@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { useState } from "react";
-import { useRequestPasswordResetEmail } from "@/hooks/mutations/use-request-password-reset-email.ts";
+import { useRequestPasswordResetEmail } from "@/hooks/mutations/auth/use-request-password-reset-email.ts";
 import { toast } from "sonner";
 import { generateErrorMessage } from "@/lib/error.ts";
 
