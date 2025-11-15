@@ -20,7 +20,7 @@ export type Database = {
           content: string
           created_at: string
           id: number
-          image_url: string[] | null
+          image_urls: string[] | null
           like_count: number
         }
         Insert: {
@@ -28,7 +28,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: number
-          image_url?: string[] | null
+          image_urls?: string[] | null
           like_count?: number
         }
         Update: {
@@ -36,7 +36,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: number
-          image_url?: string[] | null
+          image_urls?: string[] | null
           like_count?: number
         }
         Relationships: []
