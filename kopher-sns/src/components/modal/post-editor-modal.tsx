@@ -6,7 +6,11 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useCreatePost } from "@/hooks/mutations/post/use-create-post.ts";
 import { toast } from "sonner";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel.tsx";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel.tsx";
 import { useSession } from "@/store/session.ts";
 
 type Image = {
