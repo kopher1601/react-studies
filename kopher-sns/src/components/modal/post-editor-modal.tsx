@@ -12,6 +12,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel.tsx";
 import { useSession } from "@/store/session.ts";
+import { useOpenAlertModal } from "@/store/alert-modal.ts";
 
 type Image = {
   file: File;
@@ -20,6 +21,7 @@ type Image = {
 
 export default function PostEditorModal() {
   const session = useSession();
+  const openAlertModal = useOpenAlertModal();
   const { isOpen, close } = usePostEditorModal();
   const [content, setContent] = useState<string>("");
   const [images, setImages] = useState<Image[]>([]);
@@ -35,6 +37,14 @@ export default function PostEditorModal() {
   });
 
   const handleCloseModal = () => {
+    if (content !== "" || images.length !== 0) {
+      openAlertModal({
+        title: "作成中のものがあります",
+        description: "この画面から出ると、作成中の内容が失われます",
+        onPositive: () => close(),
+      });
+      return;
+    }
     close();
   };
 

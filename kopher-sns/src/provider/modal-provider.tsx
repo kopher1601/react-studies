@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import PostEditorModal from "@/components/modal/post-editor-modal.tsx";
+import AlertModal from "@/components/modal/alert-modal.tsx";
 
 export default function ModalProvider({
   children,
@@ -10,7 +11,10 @@ export default function ModalProvider({
   return (
     <>
       {createPortal(
-        <PostEditorModal />,
+        <>
+          <PostEditorModal />
+          <AlertModal />
+        </>,
         document.getElementById("modal-root")!,
       )}
       {children}
