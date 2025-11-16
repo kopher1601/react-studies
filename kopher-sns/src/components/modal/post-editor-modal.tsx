@@ -36,6 +36,24 @@ export default function PostEditorModal() {
     },
   });
 
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "auto";
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+    }
+  }, [content]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      // browser 의 메모리에서 삭제
+      images.forEach((image) => URL.revokeObjectURL(image.previewUrl));
+      return;
+    }
+    textAreaRef.current?.focus();
+    setContent("");
+    setImages([]);
+  }, [isOpen]);
+
   const handleCloseModal = () => {
     if (content !== "" || images.length !== 0) {
       openAlertModal({
@@ -47,7 +65,6 @@ export default function PostEditorModal() {
     }
     close();
   };
-
   const handleCreatePostClick = () => {
     if (content.trim() === "") {
       return;
@@ -58,7 +75,6 @@ export default function PostEditorModal() {
       userId: session!.user.id,
     });
   };
-
   const handleSelectImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -69,31 +85,15 @@ export default function PostEditorModal() {
         ]);
       });
     }
-
     e.target.value = "";
   };
-
   const handleDeleteImage = (image: Image) => {
     setImages((prevImages) =>
       prevImages.filter((img) => img.previewUrl !== image.previewUrl),
     );
+    // browser 의 메모리에서 삭제
+    URL.revokeObjectURL(image.previewUrl);
   };
-
-  useEffect(() => {
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto";
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
-    }
-  }, [content]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-    textAreaRef.current?.focus();
-    setContent("");
-    setImages([]);
-  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCloseModal}>
