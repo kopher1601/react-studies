@@ -2,6 +2,18 @@ import supabase from "@/lib/supabase.ts";
 import { uploadImage } from "@/api/image.ts";
 import type { PostEntity } from "@/types.ts";
 
+export async function fetchPosts() {
+  const { data, error } = await supabase
+    .from("post")
+    .select("*, author: profile!author_id (*)")
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+  return data;
+}
+
 export async function createPost(content: string) {
   const { data, error } = await supabase
     .from("post")
