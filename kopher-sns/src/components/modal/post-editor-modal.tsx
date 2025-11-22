@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/carousel.tsx";
 import { useSession } from "@/store/session.ts";
 import { useOpenAlertModal } from "@/store/alert-modal.ts";
+import { useUpdatePost } from "@/hooks/mutations/post/use-update-post.ts";
 
 type Image = {
   file: File;
@@ -22,19 +23,27 @@ type Image = {
 export default function PostEditorModal() {
   const session = useSession();
   const openAlertModal = useOpenAlertModal();
-  const { isOpen, close } = usePostEditorModal();
+  const postEditorModal = usePostEditorModal();
   const [content, setContent] = useState<string>("");
   const [images, setImages] = useState<Image[]>([]);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { mutate: createPost, isPending: isCreatePostPending } = useCreatePost({
     onSuccess: () => {
-      close();
+      postEditorModal.actions.close();
     },
     onError: () => {
       toast.error("ポスト生成に失敗しました", { position: "top-center" });
     },
   });
+  const { mutate: updatePost, isPending: isUpdatePostPending } = useUpdatePost({
+    onSuccess: () => {
+      postEditorModal.actions.close();
+    },
+    onError: () => {
+      toast.error("ポスト更新に失敗しました", { position: "top-center" });
+    },
+  })
 
   useEffect(() => {
     if (textAreaRef.current) {
@@ -44,36 +53,56 @@ export default function PostEditorModal() {
   }, [content]);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!postEditorModal.isOpen) {
       // browser 의 메모리에서 삭제
       images.forEach((image) => URL.revokeObjectURL(image.previewUrl));
       return;
     }
+    if (postEditorModal.type === "CREATE") {
+      setContent("");
+      setImages([]);
+    } else {
+      setContent(postEditorModal.content);
+      setImages([]);
+    }
     textAreaRef.current?.focus();
-    setContent("");
-    setImages([]);
-  }, [isOpen]);
+
+  }, [postEditorModal.isOpen]);
 
   const handleCloseModal = () => {
     if (content !== "" || images.length !== 0) {
       openAlertModal({
         title: "作成中のものがあります",
         description: "この画面から出ると、作成中の内容が失われます",
-        onPositive: () => close(),
+        onPositive: () => postEditorModal.actions.close(),
       });
       return;
     }
-    close();
+    postEditorModal.actions.close();
   };
-  const handleCreatePostClick = () => {
+  const handleSavePostClick = () => {
     if (content.trim() === "") {
       return;
     }
-    createPost({
-      content,
-      images: images.map((image) => image.file),
-      userId: session!.user.id,
-    });
+    if (!postEditorModal.isOpen) {
+      return;
+    }
+
+    if (postEditorModal.type === "CREATE") {
+      createPost({
+        content,
+        images: images.map((image) => image.file),
+        userId: session!.user.id,
+      });
+    } else {
+      if (content === postEditorModal.content) {
+        return;
+      }
+      updatePost({
+        id: postEditorModal.postId,
+        content,
+      });
+    }
   };
   const handleSelectImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -95,12 +124,14 @@ export default function PostEditorModal() {
     URL.revokeObjectURL(image.previewUrl);
   };
 
+  const isPending = isCreatePostPending || isUpdatePostPending;
+
   return (
-    <Dialog open={isOpen} onOpenChange={handleCloseModal}>
+    <Dialog open={postEditorModal.isOpen} onOpenChange={handleCloseModal}>
       <DialogContent className="max-h-[90vh]">
         <DialogTitle>ポスト作成</DialogTitle>
         <textarea
-          disabled={isCreatePostPending}
+          disabled={isPending}
           placeholder="あなたの話を聞かせてください👂"
           ref={textAreaRef}
           value={content}
@@ -114,6 +145,26 @@ export default function PostEditorModal() {
           accept="image/*"
           className="hidden"
         />
+
+        {postEditorModal.isOpen && postEditorModal.type === "EDIT" && (
+          <Carousel>
+            <CarouselContent>
+              {postEditorModal.imageUrls?.map((url, index) => (
+                <CarouselItem className="basis-2/5">
+                  <div className="relative">
+                    <img
+                      className="h-full w-full rounded-sm object-cover"
+                      key={index}
+                      src={url}
+                      alt={`image-${index}`}
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        )}
+
         {images.length > 0 && (
           <Carousel>
             <CarouselContent>
@@ -138,18 +189,22 @@ export default function PostEditorModal() {
             </CarouselContent>
           </Carousel>
         )}
+        {
+          postEditorModal.isOpen && postEditorModal.type === "CREATE" && (
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isPending}
+              variant="outline"
+              className="cursor-pointer"
+            >
+              <ImageIcon />
+              イメージ追加
+            </Button>
+          )
+        }
         <Button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isCreatePostPending}
-          variant="outline"
-          className="cursor-pointer"
-        >
-          <ImageIcon />
-          イメージ追加
-        </Button>
-        <Button
-          disabled={isCreatePostPending}
-          onClick={handleCreatePostClick}
+          disabled={isPending}
+          onClick={handleSavePostClick}
           className="cursor-pointer"
         >
           保存

@@ -7,6 +7,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { formatTimeAgo } from "@/lib/time.ts";
+import EditPostItemButton from "./edit-post-item-button";
 
 export default function PostItem(post: Post) {
   return (
@@ -36,9 +37,7 @@ export default function PostItem(post: Post) {
 
         {/* 1-2. 수정/삭제 버튼 */}
         <div className="text-muted-foreground flex text-sm">
-          <Button className="cursor-pointer" variant={"ghost"}>
-            수정
-          </Button>
+          <EditPostItemButton {...post} />
           <Button className="cursor-pointer" variant={"ghost"}>
             삭제
           </Button>
