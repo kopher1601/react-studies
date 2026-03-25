@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // postgres 모듈을 번들링하지 않고 Node.js가 직접 로드하도록 설정
+  // → OpenTelemetry(Sentry)가 모듈을 패칭하여 DB 쿼리를 자동 추적할 수 있음
+  serverExternalPackages: ["postgres"],
 };
 
 export default withSentryConfig(nextConfig, {

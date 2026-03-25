@@ -24,9 +24,9 @@ export default function Home() {
           color="blue"
         />
         <Card
-          title="API 엔드포인트"
-          description="Hono로 구축된 API 엔드포인트 목록과 테스트 도구입니다."
-          href="/api/health"
+          title="DB 쿼리 추적"
+          description="Drizzle ORM + PostgreSQL 쿼리가 Sentry에서 어떻게 추적되는지 확인합니다."
+          href="/test/database"
           color="green"
         />
       </div>

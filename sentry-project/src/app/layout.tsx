@@ -43,6 +43,9 @@ export default function RootLayout({
               <a href="/test/performance" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
                 Performance
               </a>
+              <a href="/test/database" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                DB Test
+              </a>
             </div>
           </div>
         </nav>
