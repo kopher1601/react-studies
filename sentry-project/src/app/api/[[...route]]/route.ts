@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { handle } from "hono/vercel";
 import { logger } from "hono/logger";
 import { HTTPException } from "hono/http-exception";
-import { db, dbQuery } from "@/db";
+import { db } from "@/db";
 import { products, orders } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -112,18 +112,14 @@ app.post("/orders", async (c) => {
 
 // 상품 목록 조회
 app.get("/products", async (c) => {
-  const allProducts = await dbQuery("SELECT * FROM products", () =>
-    db.select().from(products),
-  );
+  const allProducts = await db.select().from(products);
   return c.json({ products: allProducts });
 });
 
 // 상품 상세 조회
 app.get("/products/:id", async (c) => {
   const id = Number(c.req.param("id"));
-  const [product] = await dbQuery("SELECT * FROM products WHERE id = $1", () =>
-    db.select().from(products).where(eq(products.id, id)),
-  );
+  const [product] = await db.select().from(products).where(eq(products.id, id));
 
   if (!product) {
     throw new HTTPException(404, { message: `Product ${id} not found` });
@@ -135,17 +131,15 @@ app.get("/products/:id", async (c) => {
 // 상품 추가
 app.post("/products", async (c) => {
   const body = await c.req.json();
-  const [product] = await dbQuery("INSERT INTO products", () =>
-    db
-      .insert(products)
-      .values({
-        name: body.name,
-        price: body.price,
-        description: body.description || null,
-        stock: body.stock || 0,
-      })
-      .returning(),
-  );
+  const [product] = await db
+    .insert(products)
+    .values({
+      name: body.name,
+      price: body.price,
+      description: body.description || null,
+      stock: body.stock || 0,
+    })
+    .returning();
 
   return c.json({ product }, 201);
 });
@@ -155,18 +149,16 @@ app.put("/products/:id", async (c) => {
   const id = Number(c.req.param("id"));
   const body = await c.req.json();
 
-  const [product] = await dbQuery("UPDATE products SET ... WHERE id = $1", () =>
-    db
-      .update(products)
-      .set({
-        name: body.name,
-        price: body.price,
-        description: body.description,
-        stock: body.stock,
-      })
-      .where(eq(products.id, id))
-      .returning(),
-  );
+  const [product] = await db
+    .update(products)
+    .set({
+      name: body.name,
+      price: body.price,
+      description: body.description,
+      stock: body.stock,
+    })
+    .where(eq(products.id, id))
+    .returning();
 
   if (!product) {
     throw new HTTPException(404, { message: `Product ${id} not found` });
@@ -178,9 +170,10 @@ app.put("/products/:id", async (c) => {
 // 상품 삭제
 app.delete("/products/:id", async (c) => {
   const id = Number(c.req.param("id"));
-  const [deleted] = await dbQuery("DELETE FROM products WHERE id = $1", () =>
-    db.delete(products).where(eq(products.id, id)).returning(),
-  );
+  const [deleted] = await db
+    .delete(products)
+    .where(eq(products.id, id))
+    .returning();
 
   if (!deleted) {
     throw new HTTPException(404, { message: `Product ${id} not found` });
@@ -196,9 +189,7 @@ app.post("/db-orders", async (c) => {
   const quantity = body.quantity || 1;
 
   // 상품 조회
-  const [product] = await dbQuery("SELECT * FROM products WHERE id = $1", () =>
-    db.select().from(products).where(eq(products.id, productId)),
-  );
+  const [product] = await db.select().from(products).where(eq(products.id, productId));
   if (!product) {
     throw new HTTPException(404, { message: `Product ${productId} not found` });
   }
@@ -209,34 +200,28 @@ app.post("/db-orders", async (c) => {
   }
 
   // 재고 차감
-  await dbQuery("UPDATE products SET stock = $1 WHERE id = $2", () =>
-    db
-      .update(products)
-      .set({ stock: product.stock - quantity })
-      .where(eq(products.id, productId)),
-  );
+  await db
+    .update(products)
+    .set({ stock: product.stock - quantity })
+    .where(eq(products.id, productId));
 
   // 주문 생성
-  const [order] = await dbQuery("INSERT INTO orders", () =>
-    db
-      .insert(orders)
-      .values({
-        productId,
-        quantity,
-        totalPrice: product.price * quantity,
-        status: "confirmed",
-      })
-      .returning(),
-  );
+  const [order] = await db
+    .insert(orders)
+    .values({
+      productId,
+      quantity,
+      totalPrice: product.price * quantity,
+      status: "confirmed",
+    })
+    .returning();
 
   return c.json({ order, product: { ...product, stock: product.stock - quantity } }, 201);
 });
 
 // 주문 목록 조회
 app.get("/db-orders", async (c) => {
-  const allOrders = await dbQuery("SELECT * FROM orders", () =>
-    db.select().from(orders),
-  );
+  const allOrders = await db.select().from(orders);
   return c.json({ orders: allOrders });
 });
 
@@ -250,9 +235,7 @@ app.post("/seed", async (c) => {
     { name: "헤드셋", price: 120000, description: "노이즈캔슬링 헤드셋", stock: 20 },
   ];
 
-  const inserted = await dbQuery("INSERT INTO products (bulk seed)", () =>
-    db.insert(products).values(sampleProducts).returning(),
-  );
+  const inserted = await db.insert(products).values(sampleProducts).returning();
   return c.json({ message: `${inserted.length}개 상품 추가됨`, products: inserted }, 201);
 });
 

@@ -331,7 +331,9 @@ Sentry.startSpan(
 
 ### 5-1. 어떻게 SQL이 추적되는가?
 
-`sentry.server.config.ts`에 `postgresJsIntegration`을 추가하면 끝:
+두 가지 설정이 필요하다:
+
+**1) `sentry.server.config.ts`에 `postgresJsIntegration` 추가:**
 
 ```ts
 Sentry.init({
@@ -340,6 +342,19 @@ Sentry.init({
   ],
 });
 ```
+
+**2) `next.config.ts`에 `serverExternalPackages` 설정:**
+
+```ts
+const nextConfig: NextConfig = {
+  // postgres 모듈을 번들링하지 않고 Node.js가 직접 로드
+  // → Sentry(OpenTelemetry)가 모듈을 패칭하여 쿼리를 자동 추적
+  serverExternalPackages: ["postgres"],
+};
+```
+
+> `serverExternalPackages`가 없으면 Next.js가 `postgres` 모듈을 번들링하여
+> Sentry의 모듈 패칭이 동작하지 않는다. 이 설정은 DB 자동 추적의 핵심이다.
 
 이후 Drizzle ORM을 통한 모든 쿼리가 Sentry Performance에 스팬으로 자동 기록된다:
 
